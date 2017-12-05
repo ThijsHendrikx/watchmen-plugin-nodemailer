@@ -1,14 +1,14 @@
 /*jslint node: true */
 'use strict';
 
-var glob       = require('glob');
+var glob = require('glob');
 var handlebars = require('handlebars');
 var nodemailer = require('nodemailer');
-var path       = require('path');
-var fs         = require('fs');
+var path = require('path');
+var fs = require('fs');
 require('dotenv').load({ silent: true });
 
-handlebars.registerHelper('date', function(timestamp) {
+handlebars.registerHelper('date', function (timestamp) {
   return new Date(timestamp).toString();
 });
 
@@ -26,11 +26,11 @@ handlebars.registerHelper('date', function(timestamp) {
  * }
  */
 function get_templates(base_directory) {
-  var files     = glob.sync(path.join(base_directory, '**/*.hbs'));
+  var files = glob.sync(path.join(base_directory, '**/*.hbs'));
   var templates = {};
-  files.forEach(function(template_path) {
-    var parts      = path.parse(template_path);
-    var contents   = fs.readFileSync(template_path);
+  files.forEach(function (template_path) {
+    var parts = path.parse(template_path);
+    var contents = fs.readFileSync(template_path);
     var parent_dir = parts.dir.split(path.sep).pop();
 
     if (!(parent_dir in templates)) {
@@ -59,6 +59,7 @@ var templates = get_templates(p);
 var mailCredentials = {
   port: process.env.WATCHMEN_AUTH_NODEMAILER_PORT,
   host: process.env.WATCHMEN_AUTH_NODEMAILER_HOST,
+  service: process.env.WATCHMEN_AUTH_NODEMAILER_SERVICE,
   auth: {
     user: process.env.WATCHMEN_AUTH_NODEMAILER_USER,
     pass: process.env.WATCHMEN_AUTH_NODEMAILER_PASS
@@ -86,7 +87,7 @@ function emailError(err, info) {
  * Handle events from watchmen! The fun stuff!
  */
 function handleEvent(eventName) {
-  return function(service, data) {
+  return function (service, data) {
     // Don't bother if there's no template
     if (!(eventName in templates.body)) {
       return;
@@ -117,11 +118,11 @@ function handleEvent(eventName) {
  */
 function NodemailerPlugin(watchmen) {
   watchmen.on('latency-warning', handleEvent('latency-warning'));
-  watchmen.on('new-outage',      handleEvent('new-outage'));
-  watchmen.on('current-outage',  handleEvent('current-outage'));
-  watchmen.on('service-back',    handleEvent('service-back'));
-  watchmen.on('service-error',   handleEvent('service-error'));
-  watchmen.on('service-ok',      handleEvent('service-ok'));
+  watchmen.on('new-outage', handleEvent('new-outage'));
+  watchmen.on('current-outage', handleEvent('current-outage'));
+  watchmen.on('service-back', handleEvent('service-back'));
+  watchmen.on('service-error', handleEvent('service-error'));
+  watchmen.on('service-ok', handleEvent('service-ok'));
 }
 
 exports = module.exports = NodemailerPlugin;
