@@ -56,15 +56,26 @@ var templates = get_templates(p);
 /*
  * Get us a mail transporter!
  */
-var mailCredentials = {
-  port: process.env.WATCHMEN_AUTH_NODEMAILER_PORT,
-  host: process.env.WATCHMEN_AUTH_NODEMAILER_HOST,
-  service: process.env.WATCHMEN_AUTH_NODEMAILER_SERVICE,
-  auth: {
-    user: process.env.WATCHMEN_AUTH_NODEMAILER_USER,
-    pass: process.env.WATCHMEN_AUTH_NODEMAILER_PASS
+function getCredentials() {
+  var credentials = {
+    auth: {
+      user: process.env.WATCHMEN_AUTH_NODEMAILER_USER,
+      pass: process.env.WATCHMEN_AUTH_NODEMAILER_PASS
+    }
   }
-};
+
+  if (process.env.WATCHMEN_AUTH_NODEMAILER_PORT && rocess.env.WATCHMEN_AUTH_NODEMAILER_HOST) {
+    credentials.port = process.env.WATCHMEN_AUTH_NODEMAILER_PORT;
+    credentials.host = process.env.WATCHMEN_AUTH_NODEMAILER_HOS;
+  } else if (process.env.WATCHMEN_AUTH_NODEMAILER_SERVICE) {
+    credentials.service = process.env.WATCHMEN_AUTH_NODEMAILER_SERVICE;
+  }
+
+  return credentials
+}
+
+
+var mailCredentials = getCredentials();
 
 var mailDefaults = {
   from: process.env.WATCHMEN_AUTH_NODEMAILER_USER
